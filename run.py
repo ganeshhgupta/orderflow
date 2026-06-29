@@ -29,4 +29,5 @@ print("  Event stream  ->  http://localhost:8000/events/stream")
 print("  Press Ctrl+C to stop\n")
 
 import uvicorn
-uvicorn.run("api.main:app", host="0.0.0.0", port=8000, reload=False, log_level="warning")
+port = int(os.getenv("PORT", 8000))
+uvicorn.run("api.main:app", host="0.0.0.0", port=port, reload=False, log_level="warning")
