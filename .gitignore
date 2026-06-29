@@ -1,0 +1,41 @@
+# secrets — never commit
+.env
+
+# python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+env/
+
+# database & analytics output (runtime state, not source)
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+data/orders.parquet
+data/stream_inbox/
+
+# node
+frontend/node_modules/
+frontend/build/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
