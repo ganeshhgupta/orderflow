@@ -33,7 +33,11 @@ from .models import (
 )
 from .schemas import MetricsResponse, OrderCreate, OrderResponse
 
-models.Base.metadata.create_all(bind=engine)
+try:
+    models.Base.metadata.create_all(bind=engine)
+except Exception as _db_init_err:
+    import logging as _log
+    _log.getLogger(__name__).error("DB init failed: %s", _db_init_err)
 
 app = FastAPI(
     title="OrderFlow API",
