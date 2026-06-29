@@ -1,4 +1,4 @@
-﻿import { API_BASE } from '../api';
+import { API_BASE } from '../api';
 import React, { useState, useEffect, useRef } from 'react';
 
 const ITEMS = [

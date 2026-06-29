@@ -1,4 +1,4 @@
-﻿import { API_BASE } from '../api';
+import { API_BASE } from '../api';
 // frontend/src/components/MetricsTrail.tsx
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {

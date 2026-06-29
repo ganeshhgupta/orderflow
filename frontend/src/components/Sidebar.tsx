@@ -1,4 +1,4 @@
-﻿// orderflow/frontend/src/components/Sidebar.tsx
+// orderflow/frontend/src/components/Sidebar.tsx
 import React from 'react';
 import { Metrics } from '../types';
 

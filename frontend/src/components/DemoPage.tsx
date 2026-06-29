@@ -1,4 +1,4 @@
-﻿// src/components/DemoPage.tsx
+// src/components/DemoPage.tsx
 import React, { useState } from 'react';
 
 interface Step {

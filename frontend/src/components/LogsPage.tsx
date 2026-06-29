@@ -1,4 +1,4 @@
-﻿import { API_BASE } from '../api';
+import { API_BASE } from '../api';
 // frontend/src/components/LogsPage.tsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MRPLogEntry, MRPLogLevel, MRPRun, LOG_LEVEL_CONFIG } from '../types';

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Order, STATUS_CONFIG } from '../types';
 
 interface Props {

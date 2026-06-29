@@ -1,4 +1,4 @@
-﻿import { API_BASE } from './api';
+import { API_BASE } from './api';
 // orderflow/frontend/src/App.tsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Sidebar from './components/Sidebar';

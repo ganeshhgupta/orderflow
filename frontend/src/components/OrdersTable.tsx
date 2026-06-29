@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Order, OrderEvent, OrderStatus, STATUS_CONFIG, Metrics } from '../types';
 
 interface Props {

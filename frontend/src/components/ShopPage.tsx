@@ -1,4 +1,4 @@
-﻿import { API_BASE } from '../api';
+import { API_BASE } from '../api';
 // src/components/ShopPage.tsx
 import React, { useState } from 'react';
 import { PRODUCTS, Product } from '../products';
