@@ -116,3 +116,35 @@ a { color: inherit; text-decoration: none; }
 @keyframes dash {
   to { stroke-dashoffset: 0; }
 }
+@keyframes overlayFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* FlowAnimation node/edge palette — switches with theme */
+:root {
+  --fn-node-bg:    var(--surf2);
+  --fn-col-label:  rgba(0,0,0,0.22);
+  --fn-edge:       rgba(0,0,0,0.13);
+  --fn-edge-fail:  rgba(186,26,26,0.20);
+  --fn-api:        #1a56db;
+  --fn-queue:      #92400e;
+  --fn-worker:     #065f46;
+  --fn-db:         #3730a3;
+  --fn-bus:        #5b21b6;
+  --fn-sse:        #065f46;
+  --fn-dlq:        #991b1b;
+}
+[data-theme="dark"] {
+  --fn-node-bg:    #1e2235;
+  --fn-col-label:  rgba(255,255,255,0.18);
+  --fn-edge:       rgba(255,255,255,0.10);
+  --fn-edge-fail:  rgba(248,113,113,0.25);
+  --fn-api:        #60a5fa;
+  --fn-queue:      #fbbf24;
+  --fn-worker:     #34d399;
+  --fn-db:         #818cf8;
+  --fn-bus:        #c084fc;
+  --fn-sse:        #34d399;
+  --fn-dlq:        #f87171;
+}

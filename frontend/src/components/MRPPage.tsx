@@ -205,7 +205,33 @@ export default function MRPPage({ onGoToLogs }: { onGoToLogs: () => void }) {
   });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 0 }}>
+    <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', height: '100%', gap: 0 }}>
+
+      {/* Full-page loading overlay */}
+      {(triggering || seeding) && (
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 50,
+          background: 'rgba(var(--canvas-rgb, 249,249,255), 0.88)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          gap: 16, animation: 'overlayFade 0.15s ease',
+        }}>
+          <div style={{
+            width: 44, height: 44, borderRadius: '50%',
+            border: '3px solid var(--border)',
+            borderTopColor: 'var(--primary)',
+            animation: 'spin 0.8s linear infinite',
+          }} />
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--on-surface)' }}>
+              {seeding ? 'Seeding MRP Data' : 'Running MRP Engine'}
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--outline)', marginTop: 4 }}>
+              {seeding ? 'Generating materials, BOM & inventory...' : 'Exploding BOM, computing net requirements...'}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Top tab bar */}
       <div style={{

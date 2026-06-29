@@ -135,7 +135,32 @@ export default function AnalyticsPage() {
   const retriedOrders = data?.retry_dist?.filter(r => r.retry_count > 0).reduce((s, r) => s + r.count, 0) ?? 0;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, animation: 'fadeInUp 0.2s ease' }}>
+    <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 20, animation: 'fadeInUp 0.2s ease' }}>
+
+      {/* Full-page loading overlay */}
+      {running && (
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 50,
+          background: 'rgba(var(--canvas-rgb, 249,249,255), 0.88)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          gap: 16, animation: 'overlayFade 0.15s ease',
+          borderRadius: 8,
+        }}>
+          <div style={{
+            width: 44, height: 44, borderRadius: '50%',
+            border: '3px solid var(--border)',
+            borderTopColor: 'var(--primary)',
+            animation: 'spin 0.8s linear infinite',
+          }} />
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--on-surface)' }}>Running Analytics</div>
+            <div style={{ fontSize: 12, color: 'var(--outline)', marginTop: 4 }}>
+              {elapsed > 0 ? `${elapsed}s elapsed` : 'Starting batch job...'}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Header */}
       <header style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
