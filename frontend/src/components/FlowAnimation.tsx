@@ -71,7 +71,7 @@ const MSG_STAGE: [RegExp, string][] = [
   [/open requirement|PAB/i,           'pd'     ],
   [/Lot siz|EOQ calc/i,               'lotsize'],
   [/Backward scheduling|Scheduled:/i, 'sched'  ],
-  [/BOM explosion|\->/i,              'bom_ex' ],
+  [/BOM explosion|->/i,               'bom_ex' ],
   [/EX50|Stock below safety/i,        'ex'     ],
   [/exception count|EX\d{2} Created/i,'ex'     ],
   [/complete/i,                       'done'   ],
@@ -257,7 +257,7 @@ export default function FlowAnimation({ workerCount = 3 }:{workerCount?:number})
         const stage=msgToStage(msg);
         if(stage){ setMrpStage(stage); setMrpDone(d=>{const s=new Set(d);s.add(stage);return s;}); }
         /* BOM sub-nodes from "-> COMP-NUM:" lines */
-        const m=msg.match(/\[.+?\] -> ([A-Z0-9\-]+):/);
+        const m=msg.match(/\[.+?\] -> ([A-Z0-9-]+):/);
         if(m){
           const lbl=m[1];
           setBom(prev=>{
@@ -466,10 +466,8 @@ export default function FlowAnimation({ workerCount = 3 }:{workerCount?:number})
 
               {/* sub-step pills */}
               {(['lock','proc','persist'] as const).map((s,si)=>{
-                const prevDone=(s==='proc'&&step==='proc')||(s==='proc'&&step==='persist')||
-                               (s==='lock'&&(step==='proc'||step==='persist'));
-                const done= s==='lock'&&(step==='proc'||step==='persist')
-                          ||s==='proc'&&step==='persist';
+                const done= (s==='lock' && (step==='proc' || step==='persist'))
+                          || (s==='proc' && step==='persist');
                 const cur=step===s;
                 const xOff=(si-1)*29;
                 return(
