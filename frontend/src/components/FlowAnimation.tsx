@@ -12,16 +12,16 @@ interface N { x: number; y: number; label: string; color: string; }
 function buildNodes(nWorkers: number): Record<string, N> {
   const yMin = 28, yMax = 132;
   const nodes: Record<string, N> = {
-    c0:     { x: 46,  y: 38,  label: 'Client 1',  color: '#6a8af8' },
-    c1:     { x: 46,  y: 80,  label: 'Client 2',  color: '#6a8af8' },
-    c2:     { x: 46,  y: 122, label: 'Client 3',  color: '#6a8af8' },
-    router: { x: 210, y: 80,  label: 'Router',    color: '#c0c1ff' },
-    done:   { x: 560, y: 55,  label: 'Processed', color: '#4edea3' },
-    dlq:    { x: 560, y: 115, label: 'DLQ',       color: '#ff6b6b' },
+    c0:     { x: 46,  y: 38,  label: 'Client 1',  color: '#3355cc' },
+    c1:     { x: 46,  y: 80,  label: 'Client 2',  color: '#3355cc' },
+    c2:     { x: 46,  y: 122, label: 'Client 3',  color: '#3355cc' },
+    router: { x: 210, y: 80,  label: 'Router',    color: '#5b5fcf' },
+    done:   { x: 560, y: 55,  label: 'Processed', color: '#00875a' },
+    dlq:    { x: 560, y: 115, label: 'DLQ',       color: '#ba1a1a' },
   };
   for (let i = 0; i < nWorkers; i++) {
     const y = nWorkers === 1 ? 80 : yMin + (i / (nWorkers - 1)) * (yMax - yMin);
-    nodes[`w${i}`] = { x: 390, y, label: `Worker ${i + 1}`, color: '#4edea3' };
+    nodes[`w${i}`] = { x: 390, y, label: `Worker ${i + 1}`, color: '#00875a' };
   }
   return nodes;
 }
@@ -128,7 +128,7 @@ export default function FlowAnimation({ workerCount = 3 }: { workerCount?: numbe
             clientNode: `c${order_id.charCodeAt(0) % 3}`,
             workerNode: safeWorker,
             sinkNode: 'done',
-            color: '#4edea3',
+            color: '#00875a',
             phase: 'to-router',
             phaseStart: Date.now(),
             phaseDuration: 500,
@@ -138,7 +138,7 @@ export default function FlowAnimation({ workerCount = 3 }: { workerCount?: numbe
           if (p) {
             const isDone = topic === 'order.completed';
             p.sinkNode      = isDone ? 'done' : 'dlq';
-            p.color         = isDone ? '#4edea3' : '#ff6b6b';
+            p.color         = isDone ? '#00875a' : '#ba1a1a';
             p.phase         = 'to-sink';
             p.phaseStart    = Date.now();
             p.phaseDuration = 600;
@@ -198,29 +198,29 @@ export default function FlowAnimation({ workerCount = 3 }: { workerCount?: numbe
 
   return (
     <div style={{
-      background: '#0b0e1a',
-      border: '1px solid rgba(255,255,255,0.09)',
+      background: 'var(--surf1)',
+      border: '1px solid var(--border)',
       borderRadius: 8,
       padding: '14px 18px 12px',
     }}>
       {/* top bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>Live Pipeline</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--on-surface)' }}>Live Pipeline</span>
           <span style={{
             fontSize: 9, fontWeight: 700, letterSpacing: '0.08em',
-            color: '#4edea3', background: 'rgba(78,222,163,0.12)',
+            color: '#00875a', background: 'rgba(78,222,163,0.12)',
             border: '1px solid rgba(78,222,163,0.25)', borderRadius: 3,
             padding: '1px 6px', fontFamily: "'JetBrains Mono',monospace",
           }}>LIVE</span>
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
+          <span style={{ fontSize: 11, color: 'var(--outline)' }}>
             {nw} workers
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <StatPill icon="check_circle" value={stats.done} color="#4edea3" label="done"      />
-          <StatPill icon="sync"         value={stats.live} color="#c0c1ff" label="in flight" />
-          <StatPill icon="error"        value={stats.fail} color="#ff6b6b" label="failed"    />
+          <StatPill icon="check_circle" value={stats.done} color="#00875a" label="done"      />
+          <StatPill icon="sync"         value={stats.live} color="#5b5fcf" label="in flight" />
+          <StatPill icon="error"        value={stats.fail} color="#ba1a1a" label="failed"    />
         </div>
       </div>
 
@@ -239,7 +239,7 @@ export default function FlowAnimation({ workerCount = 3 }: { workerCount?: numbe
 
         {COL_LABELS.map(c => (
           <text key={c.t} x={c.x} y={H - 4} textAnchor="middle"
-            fill="rgba(255,255,255,0.20)" fontSize={7} fontWeight={600}
+            fill="rgba(0,0,0,0.22)" fontSize={7} fontWeight={600}
             fontFamily="'JetBrains Mono',monospace" letterSpacing="0.08em">
             {c.t}
           </text>
@@ -252,7 +252,7 @@ export default function FlowAnimation({ workerCount = 3 }: { workerCount?: numbe
             <path key={i}
               d={bezier(a.x + NW, a.y, b.x - NW, b.y)}
               fill="none"
-              stroke={e.fail ? 'rgba(255,107,107,0.22)' : 'rgba(192,193,255,0.30)'}
+              stroke={e.fail ? 'rgba(186,26,26,0.18)' : 'rgba(0,77,164,0.18)'}
               strokeWidth={1.5} />
           );
         })}
@@ -263,15 +263,15 @@ export default function FlowAnimation({ workerCount = 3 }: { workerCount?: numbe
             <g key={id} transform={`translate(${n.x},${n.y})`}
               style={{ filter: active ? `drop-shadow(0 0 5px ${n.color})` : 'none', transition: 'filter 0.25s' }}>
               <rect x={-NW} y={-NH} width={NW * 2} height={NH * 2} rx={4}
-                fill="rgba(8,10,22,0.92)"
-                stroke={active ? n.color : `${n.color}44`}
+                style={{ fill: 'var(--surf2)' }}
+                stroke={active ? n.color : `${n.color}55`}
                 strokeWidth={active ? 1.5 : 1} />
               {active && (
                 <rect x={-NW} y={-NH} width={NW * 2} height={NH * 2} rx={4}
-                  fill={`${n.color}0f`} />
+                  fill={`${n.color}18`} />
               )}
               <text x={0} y={0} textAnchor="middle" dominantBaseline="middle"
-                fill={active ? n.color : `${n.color}bb`}
+                fill={active ? n.color : `${n.color}99`}
                 fontSize={6.5} fontWeight={700}
                 fontFamily="'JetBrains Mono',monospace" letterSpacing="0.06em">
                 {n.label.toUpperCase()}
@@ -290,12 +290,12 @@ export default function FlowAnimation({ workerCount = 3 }: { workerCount?: numbe
       {/* legend */}
       <div style={{ display: 'flex', gap: 16, marginTop: 10 }}>
         {[
-          { c: '#6a8af8', l: 'Client'    },
-          { c: '#c0c1ff', l: 'Router'    },
-          { c: '#4edea3', l: 'Processed' },
-          { c: '#ff6b6b', l: 'DLQ'       },
+          { c: '#3355cc', l: 'Client'    },
+          { c: '#5b5fcf', l: 'Router'    },
+          { c: '#00875a', l: 'Processed' },
+          { c: '#ba1a1a', l: 'DLQ'       },
         ].map(({ c, l }) => (
-          <div key={l} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>
+          <div key={l} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: 'var(--outline)' }}>
             <div style={{ width: 6, height: 6, borderRadius: '50%', background: c }} />
             {l}
           </div>
@@ -312,7 +312,7 @@ function StatPill({ icon, value, color, label }: { icon: string; value: number; 
         style={{ fontSize: 12, color, fontVariationSettings: "'FILL' 1" }}>{icon}</span>
       <span style={{ fontSize: 13, fontWeight: 700, color,
         fontFamily: "'JetBrains Mono',monospace", lineHeight: 1 }}>{value}</span>
-      <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>{label}</span>
+      <span style={{ fontSize: 10, color: 'var(--outline)' }}>{label}</span>
     </div>
   );
 }
