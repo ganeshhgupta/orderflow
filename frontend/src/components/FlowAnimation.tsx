@@ -198,22 +198,22 @@ export default function FlowAnimation({ workerCount = 3 }: { workerCount?: numbe
 
   return (
     <div style={{
-      background: 'var(--surf1)',
-      border: '1px solid var(--border)',
+      background: '#0b0e1a',
+      border: '1px solid rgba(255,255,255,0.09)',
       borderRadius: 8,
       padding: '14px 18px 12px',
     }}>
       {/* top bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--on-surface)' }}>Live Pipeline</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>Live Pipeline</span>
           <span style={{
             fontSize: 9, fontWeight: 700, letterSpacing: '0.08em',
             color: '#4edea3', background: 'rgba(78,222,163,0.12)',
             border: '1px solid rgba(78,222,163,0.25)', borderRadius: 3,
             padding: '1px 6px', fontFamily: "'JetBrains Mono',monospace",
           }}>LIVE</span>
-          <span style={{ fontSize: 11, color: 'var(--outline)' }}>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
             {nw} workers
           </span>
         </div>
@@ -295,7 +295,7 @@ export default function FlowAnimation({ workerCount = 3 }: { workerCount?: numbe
           { c: '#4edea3', l: 'Processed' },
           { c: '#ff6b6b', l: 'DLQ'       },
         ].map(({ c, l }) => (
-          <div key={l} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: 'var(--outline)' }}>
+          <div key={l} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>
             <div style={{ width: 6, height: 6, borderRadius: '50%', background: c }} />
             {l}
           </div>
@@ -312,7 +312,7 @@ function StatPill({ icon, value, color, label }: { icon: string; value: number; 
         style={{ fontSize: 12, color, fontVariationSettings: "'FILL' 1" }}>{icon}</span>
       <span style={{ fontSize: 13, fontWeight: 700, color,
         fontFamily: "'JetBrains Mono',monospace", lineHeight: 1 }}>{value}</span>
-      <span style={{ fontSize: 10, color: 'var(--outline)' }}>{label}</span>
+      <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)' }}>{label}</span>
     </div>
   );
 }
