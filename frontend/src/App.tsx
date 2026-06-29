@@ -1,4 +1,5 @@
-﻿// orderflow/frontend/src/App.tsx
+﻿import { API_BASE } from './api';
+// orderflow/frontend/src/App.tsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Sidebar from './components/Sidebar';
 import ActivityFeed from './components/ActivityFeed';
@@ -231,8 +232,8 @@ export default function App() {
   const refresh = useCallback(async () => {
     try {
       const [mRes, oRes] = await Promise.all([
-        fetch('/metrics'),
-        fetch('/orders?limit=30'),
+        fetch(`${API_BASE}/metrics`),
+        fetch(`${API_BASE}/orders?limit=30`),
       ]);
       if (mRes.ok) {
         const newM: Metrics = await mRes.json();
@@ -310,7 +311,7 @@ export default function App() {
     let placed = 0;
     for (const item of cart) {
       try {
-        const res = await fetch('/orders', {
+        const res = await fetch(`${API_BASE}/orders`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ item: item.product.name, quantity: item.quantity, price: item.product.price }),
@@ -658,3 +659,5 @@ export default function App() {
     </div>
   );
 }
+
+

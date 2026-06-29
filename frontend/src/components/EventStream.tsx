@@ -1,4 +1,5 @@
-﻿// frontend/src/components/EventStream.tsx
+﻿import { API_BASE } from '../api';
+// frontend/src/components/EventStream.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 
 interface Order {
@@ -163,11 +164,11 @@ export default function EventStream() {
   const [allChecked, setAllChecked] = useState(false);
 
   const fetchData = useCallback(() => {
-    fetch('/orders?limit=50')
+    fetch(`${API_BASE}/orders?limit=50`)
       .then(r => r.ok ? r.json() : [])
       .then((data: Order[]) => setOrders(data))
       .catch(() => {});
-    fetch('/metrics')
+    fetch(`${API_BASE}/metrics`)
       .then(r => r.ok ? r.json() : null)
       .then((m: Metrics | null) => setMetrics(m))
       .catch(() => {});
@@ -377,3 +378,5 @@ export default function EventStream() {
     </div>
   );
 }
+
+

@@ -1,4 +1,5 @@
-﻿// src/components/ShopPage.tsx
+﻿import { API_BASE } from '../api';
+// src/components/ShopPage.tsx
 import React, { useState } from 'react';
 import { PRODUCTS, Product } from '../products';
 
@@ -61,7 +62,7 @@ export default function ShopPage({ onAddToCart }: ShopPageProps) {
   async function placeOrder() {
     setOrderState('loading');
     try {
-      const res = await fetch('/orders', {
+      const res = await fetch(`${API_BASE}/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ item: selected.name, quantity: qty, price: selected.price }),
@@ -474,3 +475,5 @@ export default function ShopPage({ onAddToCart }: ShopPageProps) {
     </div>
   );
 }
+
+

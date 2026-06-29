@@ -1,4 +1,5 @@
-﻿// frontend/src/components/LogsPage.tsx
+﻿import { API_BASE } from '../api';
+// frontend/src/components/LogsPage.tsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MRPLogEntry, MRPLogLevel, MRPRun, LOG_LEVEL_CONFIG } from '../types';
 
@@ -97,7 +98,7 @@ export default function LogsPage() {
 
   const loadRuns = useCallback(async () => {
     try {
-      const r = await fetch('/mrp/runs');
+      const r = await fetch(`${API_BASE}/mrp/runs`);
       if (r.ok) {
         const data: MRPRun[] = await r.json();
         setRuns(data);
@@ -129,7 +130,7 @@ export default function LogsPage() {
     setLogs([]);
     setStreaming(true);
 
-    const es = new EventSource(`/mrp/runs/${run_id}/stream`);
+    const es = new EventSource(`${API_BASE}/mrp/runs/${run_id}/stream`);
     esRef.current = es;
 
     es.onmessage = (e) => {
@@ -159,7 +160,7 @@ export default function LogsPage() {
   const triggerRun = async () => {
     setTriggering(true);
     try {
-      const r = await fetch('/mrp/run', { method: 'POST' });
+      const r = await fetch(`${API_BASE}/mrp/run`, { method: 'POST' });
       if (r.ok) {
         const data = await r.json();
         setSelectedRun(data.run_id);
@@ -328,3 +329,5 @@ export default function LogsPage() {
     </div>
   );
 }
+
+

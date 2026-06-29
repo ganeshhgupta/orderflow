@@ -20,8 +20,9 @@ env/
 *.db-journal
 *.db-shm
 *.db-wal
-data/orders.parquet
-data/stream_inbox/
+data/
+*.parquet
+*.parquet.tmp
 
 # node
 frontend/node_modules/

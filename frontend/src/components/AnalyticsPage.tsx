@@ -1,4 +1,5 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import { API_BASE } from '../api';
+import React, { useState, useEffect } from 'react';
 import FlowAnimation from './FlowAnimation';
 
 interface HourlyRow  { hour: string; total: number; completed: number; failed: number }
@@ -52,8 +53,8 @@ export default function AnalyticsPage() {
     async function init() {
       try {
         const [sr, mr] = await Promise.all([
-          fetch('/analytics/summary'),
-          fetch('/metrics'),
+          fetch(`${API_BASE}/analytics/summary`),
+          fetch(`${API_BASE}/metrics`),
         ]);
         if (mr.ok) {
           const m = await mr.json();
@@ -71,7 +72,7 @@ export default function AnalyticsPage() {
 
   async function loadSummary() {
     try {
-      const r = await fetch('/analytics/summary');
+      const r = await fetch(`${API_BASE}/analytics/summary`);
       if (r.ok) {
         const d = await r.json();
         if (Object.keys(d).length > 0) setData(d);
@@ -84,7 +85,7 @@ export default function AnalyticsPage() {
     const t0 = Date.now();
     const ticker = setInterval(() => setElapsed(Math.floor((Date.now() - t0) / 1000)), 500);
     try {
-      const r    = await fetch('/analytics/run', { method: 'POST' });
+      const r    = await fetch(`${API_BASE}/analytics/run`, { method: 'POST' });
       const text = await r.text();
       clearInterval(ticker);
       let body: any = {};
@@ -491,3 +492,5 @@ export default function AnalyticsPage() {
     </div>
   );
 }
+
+

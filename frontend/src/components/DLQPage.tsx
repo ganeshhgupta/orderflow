@@ -1,4 +1,5 @@
-﻿// src/components/DLQPage.tsx
+﻿import { API_BASE } from '../api';
+// src/components/DLQPage.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { Order } from '../types';
 
@@ -50,7 +51,7 @@ export default function DLQPage() {
   }
 
   const fetchDLQ = useCallback(async () => {
-    const res = await fetch('/dlq');
+    const res = await fetch(`${API_BASE}/dlq`);
     if (res.ok) setOrders(await res.json());
     setLoading(false);
   }, []);
@@ -91,7 +92,7 @@ export default function DLQPage() {
     if (!window.confirm(`Requeue all ${orders.length} failed orders?`)) return;
     setRetryingAll(true);
     try {
-      const res = await fetch('/dlq/retry-all', { method: 'POST' });
+      const res = await fetch(`${API_BASE}/dlq/retry-all`, { method: 'POST' });
       if (res.ok) {
         const { retried } = await res.json();
         setOrders([]);
@@ -493,3 +494,5 @@ export default function DLQPage() {
     </div>
   );
 }
+
+

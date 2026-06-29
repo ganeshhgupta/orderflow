@@ -1,3 +1,4 @@
+﻿import { API_BASE } from '../api';
 // src/components/FlowAnimation.tsx
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 
@@ -111,7 +112,7 @@ export default function FlowAnimation({ workerCount = 3 }: { workerCount?: numbe
 
   // SSE — one persistent connection for the life of the component
   useEffect(() => {
-    const es = new EventSource('/events/stream');
+    const es = new EventSource(`${API_BASE}/events/stream`);
 
     es.onmessage = (e) => {
       if (!e.data || e.data.startsWith(':')) return;
@@ -315,3 +316,5 @@ function StatPill({ icon, value, color, label }: { icon: string; value: number; 
     </div>
   );
 }
+
+

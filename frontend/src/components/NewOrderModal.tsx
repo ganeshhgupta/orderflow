@@ -1,4 +1,5 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+﻿import { API_BASE } from '../api';
+import React, { useState, useEffect, useRef } from 'react';
 
 const ITEMS = [
   'Laptop', 'GPU', 'Headphones', 'Mechanical Keyboard', '4K Monitor',
@@ -47,7 +48,7 @@ export default function NewOrderModal({ onClose, onSuccess }: Props) {
     try {
       // Each unit becomes its own queue job so the pipeline graph shows real activity.
       for (let i = 0; i < count; i++) {
-        await fetch('/orders', {
+        await fetch(`${API_BASE}/orders`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ item, quantity: 1, price: unitPrice }),
@@ -63,7 +64,7 @@ export default function NewOrderModal({ onClose, onSuccess }: Props) {
     setBusy(true);
     try {
       for (let i = 0; i < 15; i++) {
-        await fetch('/orders', {
+        await fetch(`${API_BASE}/orders`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -221,3 +222,5 @@ export default function NewOrderModal({ onClose, onSuccess }: Props) {
     </div>
   );
 }
+
+

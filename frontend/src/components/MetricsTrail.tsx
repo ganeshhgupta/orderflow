@@ -1,4 +1,5 @@
-﻿// frontend/src/components/MetricsTrail.tsx
+﻿import { API_BASE } from '../api';
+// frontend/src/components/MetricsTrail.tsx
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid,
@@ -58,7 +59,7 @@ export default function MetricsTrail() {
 
   const fetchHistory = useCallback(async () => {
     try {
-      const r = await fetch('/metrics/history');
+      const r = await fetch(`${API_BASE}/metrics/history`);
       if (r.ok) setData(await r.json());
     } catch (_) {}
   }, []);
@@ -255,3 +256,5 @@ export default function MetricsTrail() {
     </div>
   );
 }
+
+

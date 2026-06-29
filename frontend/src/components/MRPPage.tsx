@@ -1,4 +1,5 @@
-﻿// frontend/src/components/MRPPage.tsx
+﻿import { API_BASE } from '../api';
+// frontend/src/components/MRPPage.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   MRPMaterial, MRPRequirement, PlannedOrder, MRPRun,
@@ -116,11 +117,11 @@ export default function MRPPage({ onGoToLogs }: { onGoToLogs: () => void }) {
   const load = useCallback(async () => {
     try {
       const [mRes, rRes, pRes, runsRes, bomRes] = await Promise.all([
-        fetch('/mrp/materials'),
-        fetch('/mrp/requirements'),
-        fetch('/mrp/planned-orders'),
-        fetch('/mrp/runs'),
-        fetch('/mrp/bom'),
+        fetch(`${API_BASE}/mrp/materials`),
+        fetch(`${API_BASE}/mrp/requirements`),
+        fetch(`${API_BASE}/mrp/planned-orders`),
+        fetch(`${API_BASE}/mrp/runs`),
+        fetch(`${API_BASE}/mrp/bom`),
       ]);
       if (mRes.ok) setMaterials(await mRes.json());
       if (rRes.ok) setRequirements(await rRes.json());
@@ -138,7 +139,7 @@ export default function MRPPage({ onGoToLogs }: { onGoToLogs: () => void }) {
   const seedData = async () => {
     setSeeding(true);
     try {
-      await fetch('/mrp/seed', { method: 'POST' });
+      await fetch(`${API_BASE}/mrp/seed`, { method: 'POST' });
       await load();
       showToast('Seeded 11 materials + BOM structure + stock and requirements');
     } catch (_) {}
@@ -148,7 +149,7 @@ export default function MRPPage({ onGoToLogs }: { onGoToLogs: () => void }) {
   const runMRP = async () => {
     setTriggering(true);
     try {
-      const r = await fetch('/mrp/run', { method: 'POST' });
+      const r = await fetch(`${API_BASE}/mrp/run`, { method: 'POST' });
       if (r.ok) {
         showToast('MRP run started â€" switching to Logs for live view');
         setTimeout(onGoToLogs, 800);
@@ -775,3 +776,5 @@ export default function MRPPage({ onGoToLogs }: { onGoToLogs: () => void }) {
     </div>
   );
 }
+
+
