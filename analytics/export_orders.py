@@ -1,30 +1,30 @@
 """
-Export orders from SQLite to Parquet so PySpark can read them.
-Called by api/main.py before running the batch job.
+Export orders to Parquet so the batch analytics job can read them.
+Uses the shared SQLAlchemy engine so it works with SQLite (dev) and Postgres (prod).
 """
 import os
-import sqlite3
+import sys
+
 import pandas as pd
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, ROOT)
 
 
 def export_to_parquet(out_path: str | None = None) -> int:
     if out_path is None:
         out_path = os.path.join(ROOT, "data", "orders.parquet")
 
-    db_path = os.path.join(ROOT, "orderflow.db")
-    if not os.path.exists(db_path):
-        raise FileNotFoundError(f"Database not found: {db_path}")
+    from api.database import engine
 
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
 
-    conn = sqlite3.connect(db_path)
-    df = pd.read_sql("SELECT * FROM orders", conn)
-    conn.close()
+    with engine.connect() as conn:
+        df = pd.read_sql("SELECT * FROM orders", conn)
 
     for col in ("created_at", "updated_at", "processed_at"):
-        df[col] = pd.to_datetime(df[col], format="mixed", errors="coerce")
+        if col in df.columns:
+            df[col] = pd.to_datetime(df[col], format="mixed", errors="coerce")
 
     df.to_parquet(out_path, index=False)
     return len(df)

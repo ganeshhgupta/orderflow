@@ -10,9 +10,13 @@ import pandas as pd
 
 ROOT   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INPUT  = os.path.join(ROOT, "data", "orders.parquet")
-# Use LOCALAPPDATA to stay off OneDrive, which locks parquet files during sync.
-_LOCAL = os.environ.get("LOCALAPPDATA") or os.path.join(os.path.expanduser("~"), "AppData", "Local")
-OUTPUT = os.path.join(_LOCAL, "orderflow", "analytics")
+# On Windows use LOCALAPPDATA to avoid OneDrive locking parquet files during sync.
+# On Linux (Render) write under the project data directory.
+if os.name == "nt":
+    _LOCAL = os.environ.get("LOCALAPPDATA") or os.path.join(os.path.expanduser("~"), "AppData", "Local")
+    OUTPUT = os.path.join(_LOCAL, "orderflow", "analytics")
+else:
+    OUTPUT = os.path.join(ROOT, "data", "analytics")
 
 
 def run() -> dict:

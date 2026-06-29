@@ -385,8 +385,11 @@ def analytics_summary() -> Dict[str, Any]:
     except ImportError:
         raise HTTPException(status_code=503, detail="pandas not installed")
 
-    _local = os.environ.get("LOCALAPPDATA") or os.path.join(os.path.expanduser("~"), "AppData", "Local")
-    base = os.path.join(_local, "orderflow", "analytics")
+    if os.name == "nt":
+        _local = os.environ.get("LOCALAPPDATA") or os.path.join(os.path.expanduser("~"), "AppData", "Local")
+        base = os.path.join(_local, "orderflow", "analytics")
+    else:
+        base = os.path.join(_ROOT, "data", "analytics")
     out: Dict[str, Any] = {}
     for name in ("hourly", "by_item", "retry_dist", "proc_stats"):
         path = os.path.join(base, f"{name}.parquet")
