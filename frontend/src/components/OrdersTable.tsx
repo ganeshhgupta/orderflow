@@ -1,3 +1,4 @@
+import { API_BASE } from '../api';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Order, OrderEvent, OrderStatus, STATUS_CONFIG, Metrics } from '../types';
 
@@ -98,7 +99,7 @@ export default function OrdersTable({ onRefresh, onNewOrder, metrics }: Props) {
     if (statusFilter !== 'ALL') params.set('status', statusFilter);
     params.set('limit', String(pageSize));
     params.set('offset', String((page - 1) * pageSize));
-    const res = await fetch(`/orders?${params}`);
+    const res = await fetch(`${API_BASE}/orders?${params}`);
     if (res.ok) setOrders(await res.json());
   }, [statusFilter, page]);
 
@@ -119,7 +120,7 @@ export default function OrdersTable({ onRefresh, onNewOrder, metrics }: Props) {
     e.stopPropagation();
     setCancelling(prev => { const s = new Set(prev); s.add(o.id); return s; });
     try {
-      const res = await fetch(`/orders/${o.id}/cancel`, { method: 'POST' });
+      const res = await fetch(`${API_BASE}/orders/${o.id}/cancel`, { method: 'POST' });
       if (res.ok) {
         setOrders(prev => prev.map(x => x.id === o.id ? { ...x, status: 'CANCELLED' } : x));
         showToast(`Cancelled ${o.item}`);
@@ -133,7 +134,7 @@ export default function OrdersTable({ onRefresh, onNewOrder, metrics }: Props) {
     if (expandedId === id) { setExpanded(null); return; }
     setExpanded(id);
     setLoadingEv(true);
-    const res = await fetch(`/orders/${id}/events`);
+    const res = await fetch(`${API_BASE}/orders/${id}/events`);
     if (res.ok) setEvents(await res.json());
     setLoadingEv(false);
   }

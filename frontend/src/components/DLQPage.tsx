@@ -65,7 +65,7 @@ export default function DLQPage() {
   async function retryOrder(o: Order) {
     setRetrying(prev => { const s = new Set(prev); s.add(o.id); return s; });
     try {
-      const res = await fetch(`/dlq/${o.id}/retry`, { method: 'POST' });
+      const res = await fetch(`${API_BASE}/dlq/${o.id}/retry`, { method: 'POST' });
       if (res.ok) {
         setOrders(prev => prev.filter(x => x.id !== o.id));
         showToast(`Retrying ${o.item}...`);
@@ -78,7 +78,7 @@ export default function DLQPage() {
   async function dismissOrder(o: Order) {
     setDismissing(prev => { const s = new Set(prev); s.add(o.id); return s; });
     try {
-      const res = await fetch(`/dlq/${o.id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE}/dlq/${o.id}`, { method: 'DELETE' });
       if (res.ok || res.status === 204) {
         setOrders(prev => prev.filter(x => x.id !== o.id));
         showToast(`Dismissed ${o.item}`);

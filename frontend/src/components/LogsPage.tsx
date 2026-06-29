@@ -117,7 +117,7 @@ export default function LogsPage() {
     const run = runs.find(r => r.id === selectedRun);
     if (run?.status !== 'RUNNING') {
       // Load all logs at once for completed runs
-      fetch(`/mrp/runs/${selectedRun}/logs`)
+      fetch(`${API_BASE}/mrp/runs/${selectedRun}/logs`)
         .then(r => r.json())
         .then((data: MRPLogEntry[]) => setLogs(data))
         .catch(() => {});
