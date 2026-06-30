@@ -21,7 +21,8 @@ def export_to_parquet(out_path: str | None = None) -> int:
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
 
     with engine.connect() as conn:
-        df = pd.read_sql(text("SELECT * FROM orders"), conn)
+        result = conn.execute(text("SELECT * FROM orders"))
+        df = pd.DataFrame(result.mappings().fetchall())
 
     for col in ("created_at", "updated_at", "processed_at"):
         if col in df.columns:
