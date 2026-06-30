@@ -259,6 +259,14 @@ export default function App() {
     return () => clearInterval(id);
   }, [refresh]);
 
+  // Keepalive ping to prevent Render free-tier sleep (spins down after 15min inactivity)
+  useEffect(() => {
+    const ping = () => fetch(`${API_BASE}/health`).catch(() => {});
+    ping();
+    const id = setInterval(ping, 59000);
+    return () => clearInterval(id);
+  }, []);
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
   }, [dark]);
