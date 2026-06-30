@@ -78,22 +78,6 @@ function ExChip({ code }: { code: string }) {
   );
 }
 
-const DEMO_INVENTORY = [
-  { sku: 'ELC-293-XJ', name: 'OptiCore Processor V2', warehouse: 'NAE-01', onHand: 1240, reserved: 120 },
-  { sku: 'IND-004-PQ', name: 'Heavy Duty Actuator L-400', warehouse: 'EUC-02', onHand: 12, reserved: 8 },
-  { sku: 'RAW-881-MZ', name: 'Aluminum Alloy T-66 (Pre-cut)', warehouse: 'NAW-05', onHand: 0, reserved: 45 },
-  { sku: 'OFF-102-AS', name: 'Ergonomic Standing Desk Frame', warehouse: 'APS-09', onHand: 450, reserved: 0 },
-  { sku: 'ELC-552-RR', name: 'Li-Ion Battery Pack 5000mAh', warehouse: 'NAE-01', onHand: 3400, reserved: 1200 },
-  { sku: 'IND-017-KP', name: 'Cable Management Rail 2U', warehouse: 'EUC-02', onHand: 5, reserved: 2 },
-  { sku: 'RAW-230-QT', name: 'Stainless Steel Sheet 0.5mm', warehouse: 'NAW-05', onHand: 820, reserved: 200 },
-  { sku: 'ELC-091-BV', name: 'Micro Controller Unit v3', warehouse: 'APS-09', onHand: 0, reserved: 14 },
-];
-
-const SEL_STYLE: React.CSSProperties = {
-  background: T.l2, color: T.text, border: `1px solid ${T.border}`,
-  borderRadius: 4, padding: '6px 10px', fontSize: 12, outline: 'none',
-  width: '100%', cursor: 'pointer',
-};
 
 export default function MRPPage({ onGoToLogs }: { onGoToLogs: () => void }) {
   const [materials, setMaterials] = useState<MRPMaterial[]>([]);
@@ -162,17 +146,14 @@ export default function MRPPage({ onGoToLogs }: { onGoToLogs: () => void }) {
     ? Math.max(...materials.map(m => Math.max(m.on_hand, m.safety_stock * 3, 100)))
     : 100;
 
-  // Build inventory rows from materials or demo data
   type InvRow = { sku: string; name: string; warehouse: string; onHand: number; reserved: number };
-  const invRows: InvRow[] = materials.length > 0
-    ? materials.map(m => ({
-        sku: m.number,
-        name: m.description,
-        warehouse: 'WH-' + m.number.slice(-2),
-        onHand: m.on_hand,
-        reserved: m.safety_stock,
-      }))
-    : DEMO_INVENTORY;
+  const invRows: InvRow[] = materials.map(m => ({
+    sku: m.number,
+    name: m.description,
+    warehouse: 'WH-' + m.number.slice(-2),
+    onHand: m.on_hand,
+    reserved: m.safety_stock,
+  }));
 
   const filteredRows = invRows.filter(r => {
     if (stockFilter === 'critical') return r.onHand === 0;
@@ -183,8 +164,6 @@ export default function MRPPage({ onGoToLogs }: { onGoToLogs: () => void }) {
   const totalSKUs = invRows.length;
   const outOfStock = invRows.filter(r => r.onHand === 0).length;
   const lowStock = invRows.filter(r => r.onHand > 0 && r.onHand <= r.reserved * 2).length;
-  const totalValue = invRows.reduce((s, r) => s + r.onHand * 42.5, 0);
-
   const toggleRow = (sku: string) => {
     setSelectedRows(prev => {
       const n = new Set(prev);
@@ -251,16 +230,14 @@ export default function MRPPage({ onGoToLogs }: { onGoToLogs: () => void }) {
         <div style={{ flex: 1, overflowY: 'auto', padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
 
           {/* KPI cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
             {[
-              { label: 'Total SKUs', value: totalSKUs.toString(), delta: '+4.2%', deltaColor: T.secondary, icon: 'inventory_2' },
+              { label: 'Total SKUs', value: totalSKUs.toString(), delta: `${invRows.length} materials`, deltaColor: T.secondary, icon: 'inventory_2', accent: false },
               { label: 'Out of Stock', value: outOfStock.toString(), delta: `${lowStock} low`, deltaColor: T.error, icon: 'warning', accent: true },
-              { label: 'Inbound (7d)', value: '2,150', delta: '8 Shipments', deltaColor: T.primary, icon: 'local_shipping' },
-              { label: 'Inventory Value', value: `$${(totalValue / 1000).toFixed(1)}k`, delta: 'live', deltaColor: T.tertiary, icon: 'payments' },
             ].map((k, i) => (
               <div key={k.label} style={{
-                background: i === 3 ? 'rgba(192,193,255,0.08)' : T.surface,
-                border: `1px solid ${i === 3 ? 'rgba(192,193,255,0.2)' : T.border}`,
+                background: T.surface,
+                border: `1px solid ${T.border}`,
                 borderRadius: 6, padding: '14px 16px',
               }}>
                 <div style={{ fontSize: 10, fontWeight: 600, color: T.dim, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
@@ -285,35 +262,6 @@ export default function MRPPage({ onGoToLogs }: { onGoToLogs: () => void }) {
             borderRadius: '6px 6px 0 0', padding: '12px 16px',
             display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'flex-end',
           }}>
-            <div style={{ flex: 1, minWidth: 160 }}>
-              <div style={{ fontSize: 10, color: T.dim, marginBottom: 4, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Warehouse</div>
-              <select style={SEL_STYLE}>
-                <option>All Global Facilities</option>
-                <option>NAE-01 (Jersey City)</option>
-                <option>NAW-05 (Seattle)</option>
-                <option>EUC-02 (Berlin)</option>
-                <option>APS-09 (Singapore)</option>
-              </select>
-            </div>
-            <div style={{ flex: 1, minWidth: 160 }}>
-              <div style={{ fontSize: 10, color: T.dim, marginBottom: 4, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Category</div>
-              <select style={SEL_STYLE}>
-                <option>All Categories</option>
-                <option>Electronics</option>
-                <option>Industrial</option>
-                <option>Raw Materials</option>
-                <option>Office</option>
-              </select>
-            </div>
-            <div style={{ flex: 1, minWidth: 160 }}>
-              <div style={{ fontSize: 10, color: T.dim, marginBottom: 4, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Supplier</div>
-              <select style={SEL_STYLE}>
-                <option>All Suppliers</option>
-                <option>Global Dynamics Inc.</option>
-                <option>Apex Logistics</option>
-                <option>Precision Parts Co.</option>
-              </select>
-            </div>
             <div style={{ flex: 1, minWidth: 200 }}>
               <div style={{ fontSize: 10, color: T.dim, marginBottom: 4, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Stock Level</div>
               <div style={{ display: 'flex', gap: 4 }}>
@@ -328,17 +276,6 @@ export default function MRPPage({ onGoToLogs }: { onGoToLogs: () => void }) {
                   }}>{f}</button>
                 ))}
               </div>
-            </div>
-            <div>
-              <button style={{
-                padding: '7px 14px', background: 'rgba(78,222,163,0.12)',
-                color: T.secondary, border: `1px solid rgba(78,222,163,0.3)`,
-                borderRadius: 4, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                display: 'flex', alignItems: 'center', gap: 6,
-              }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 14 }}>filter_list_off</span>
-                Clear
-              </button>
             </div>
           </div>
 
@@ -444,22 +381,11 @@ export default function MRPPage({ onGoToLogs }: { onGoToLogs: () => void }) {
 
             {/* Table footer */}
             <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              display: 'flex', alignItems: 'center',
               padding: '10px 16px', borderTop: `1px solid ${T.border}`,
               fontSize: 11, color: T.dim,
             }}>
               <span>Showing {filteredRows.length} of {invRows.length} items</span>
-              <div style={{ display: 'flex', gap: 4 }}>
-                {[1, 2, 3].map(p => (
-                  <button key={p} style={{
-                    width: 28, height: 28, borderRadius: 4,
-                    background: p === 1 ? 'rgba(192,193,255,0.15)' : 'transparent',
-                    color: p === 1 ? T.primary : T.dim,
-                    border: `1px solid ${p === 1 ? T.primary : T.border}`,
-                    cursor: 'pointer', fontSize: 12, fontWeight: 600,
-                  }}>{p}</button>
-                ))}
-              </div>
             </div>
           </div>
         </div>

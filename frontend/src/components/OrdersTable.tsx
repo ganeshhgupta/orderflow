@@ -75,13 +75,6 @@ function activityProgress(o: Order): number {
   }
 }
 
-const WORKERS = ['Worker_Alpha_01', 'Worker_Gamma_09', 'Worker_Node_14', 'Edge_Compute_A', 'Worker_Beta_04'];
-function workerName(id: string): string {
-  let h = 0;
-  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) & 0x7fffffff;
-  return WORKERS[h % WORKERS.length];
-}
-
 export default function OrdersTable({ onRefresh, onNewOrder, metrics }: Props) {
   const [orders, setOrders]           = useState<Order[]>([]);
   const [statusFilter, setFilter]     = useState<OrderStatus | 'ALL'>('ALL');
@@ -236,7 +229,7 @@ export default function OrdersTable({ onRefresh, onNewOrder, metrics }: Props) {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: 'var(--surf3)', borderBottom: '1px solid var(--border)' }}>
-              {['Order ID', 'SKU Reference', 'Status', 'Activity', 'Timestamp (UTC)', 'Worker', 'Retries'].map(h => (
+              {['Order ID', 'SKU Reference', 'Status', 'Activity', 'Timestamp (UTC)', 'Retries'].map(h => (
                 <th key={h} style={{
                   padding: '8px 14px', textAlign: 'left', fontSize: 10,
                   fontWeight: 700, color: '#464554', letterSpacing: '0.07em', textTransform: 'uppercase',
@@ -250,7 +243,7 @@ export default function OrdersTable({ onRefresh, onNewOrder, metrics }: Props) {
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={7} style={{ padding: '48px', textAlign: 'center', color: '#464554', fontSize: 13 }}>
+                <td colSpan={6} style={{ padding: '48px', textAlign: 'center', color: '#464554', fontSize: 13 }}>
                   No orders found
                 </td>
               </tr>
@@ -305,13 +298,6 @@ export default function OrdersTable({ onRefresh, onNewOrder, metrics }: Props) {
                   <td style={{ padding: '8px 14px', fontSize: 11, color: '#464554', fontFamily: "'JetBrains Mono', monospace", whiteSpace: 'nowrap' }}>
                     {(o.updated_at ?? o.created_at).replace('T', ' ').slice(0, 19)}
                   </td>
-                  {/* Worker */}
-                  <td style={{ padding: '8px 14px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: 14, color: 'var(--outline)' }}>dns</span>
-                      <span style={{ fontSize: 11, color: 'var(--on-variant)' }}>{workerName(o.id)}</span>
-                    </div>
-                  </td>
                   {/* Retries + cancel */}
                   <td style={{ padding: '8px 14px', textAlign: 'right' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8 }}>
@@ -337,7 +323,7 @@ export default function OrdersTable({ onRefresh, onNewOrder, metrics }: Props) {
 
                 {expandedId === o.id && (
                   <tr style={{ background: 'rgba(192,193,255,0.03)' }}>
-                    <td colSpan={7} style={{ padding: '0 14px 14px 46px' }}>
+                    <td colSpan={6} style={{ padding: '0 14px 14px 46px' }}>
                       <div style={{
                         fontSize: 10, fontWeight: 600, color: 'var(--outline)',
                         textTransform: 'uppercase', letterSpacing: '0.05em',
@@ -484,12 +470,12 @@ export default function OrdersTable({ onRefresh, onNewOrder, metrics }: Props) {
         boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
       }}>
         <div>
-          <div style={{ fontSize: 9, fontWeight: 700, color: '#464554', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>Throughput</div>
+          <div style={{ fontSize: 9, fontWeight: 700, color: '#464554', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>Active Orders</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
             <span style={{ fontSize: 16, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: 'var(--secondary)' }}>
-              {(metrics.total_processing * 1.37 + metrics.queue_depth * 0.12).toFixed(1)}
+              {metrics.total_processing}
             </span>
-            <span style={{ fontSize: 10, color: 'var(--outline)' }}>req/s</span>
+            <span style={{ fontSize: 10, color: 'var(--outline)' }}>processing</span>
           </div>
         </div>
         <div style={{ width: 1, height: 28, background: 'var(--border)' }} />
@@ -502,33 +488,6 @@ export default function OrdersTable({ onRefresh, onNewOrder, metrics }: Props) {
                 : '0.0%'}
             </span>
           </div>
-        </div>
-        <div style={{ width: 1, height: 28, background: 'var(--border)' }} />
-        {/* Mini sparkline */}
-        <div>
-          <div style={{ fontSize: 9, fontWeight: 700, color: '#464554', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>24h</div>
-          <svg width="56" height="20" viewBox="0 0 56 20">
-            {(() => {
-              const base = metrics.total_processing;
-              const pts = [0,8,16,24,32,40,48,56].map((x, i) => {
-                const y = 18 - ((Math.sin(i * 0.9 + base * 0.1) * 0.5 + 0.5) * 14 + (base > 0 ? 2 : 0));
-                return `${x},${y.toFixed(1)}`;
-              });
-              const path = `M ${pts.join(' L ')}`;
-              return (
-                <>
-                  <path d={path} fill="none" stroke="var(--secondary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />
-                  <path d={`${path} L 56,20 L 0,20 Z`} fill="url(#sparkGrad)" opacity="0.15" />
-                  <defs>
-                    <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="var(--secondary)" />
-                      <stop offset="100%" stopColor="var(--secondary)" stopOpacity="0" />
-                    </linearGradient>
-                  </defs>
-                </>
-              );
-            })()}
-          </svg>
         </div>
       </div>
     )}
