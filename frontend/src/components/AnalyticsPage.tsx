@@ -14,17 +14,6 @@ interface Summary {
   proc_stats?: ProcStats[];
 }
 
-function getCatForItem(item: string): string {
-  const cats = ['Electronics', 'Lab Supplies', 'Furniture', 'Consumer Goods', 'Raw Materials'];
-  let h = 0;
-  for (let i = 0; i < item.length; i++) h = (h * 31 + item.charCodeAt(i)) & 0x7fffffff;
-  return cats[h % cats.length];
-}
-
-function getIconForCat(cat: string): string {
-  const m: Record<string, string> = { Electronics: 'devices', 'Lab Supplies': 'vaccines', Furniture: 'chair', 'Consumer Goods': 'nutrition', 'Raw Materials': 'factory' };
-  return m[cat] ?? 'inventory_2';
-}
 
 function getVelocity(completed: number, maxCompleted: number): { label: string; icon: string; color: string } {
   const r = maxCompleted > 0 ? completed / maxCompleted : 0;
@@ -450,7 +439,7 @@ export default function AnalyticsPage() {
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                   <thead>
                     <tr style={{ background: 'var(--border)', borderBottom: '1px solid var(--border)' }}>
-                      {['SKU / ITEM NAME', 'CATEGORY', 'COMPLETED', 'FAILED', 'VELOCITY', 'STATUS'].map(h => (
+                      {['SKU / ITEM NAME', 'COMPLETED', 'FAILED', 'VELOCITY', 'STATUS'].map(h => (
                         <th key={h} style={{
                           padding: '8px 14px', fontSize: 10, fontWeight: 700, color: 'var(--secondary)',
                           textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap',
@@ -461,11 +450,8 @@ export default function AnalyticsPage() {
                   </thead>
                   <tbody>
                     {items.slice(0, 8).map((r, idx) => {
-                      const cat    = getCatForItem(r.item);
-                      const icon   = getIconForCat(cat);
                       const vel    = getVelocity(r.completed, maxCompleted);
                       const stat   = getStatus(r.failure_pct, r.completed, maxCompleted);
-                      const sku    = `SKU-${r.item.slice(0, 3).toUpperCase()}-${String(idx * 1000 + 1042).padStart(4, '0')}`;
                       const rowBg  = idx % 2 === 1 ? 'rgba(255,255,255,0.015)' : 'transparent';
                       return (
                         <tr key={r.item}
@@ -476,16 +462,12 @@ export default function AnalyticsPage() {
                           <td style={{ padding: '10px 14px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                               <div style={{ width: 34, height: 34, borderRadius: 4, background: 'var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                <span className="material-symbols-outlined" style={{ fontSize: 17, color: 'var(--primary)' }}>{icon}</span>
+                                <span className="material-symbols-outlined" style={{ fontSize: 17, color: 'var(--primary)' }}>inventory_2</span>
                               </div>
                               <div>
                                 <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--on-surface)', margin: 0 }}>{r.item}</p>
-                                <p style={{ fontSize: 11, color: 'var(--outline)', margin: 0, fontFamily: "'JetBrains Mono', monospace" }}>{sku}</p>
                               </div>
                             </div>
-                          </td>
-                          <td style={{ padding: '10px 14px' }}>
-                            <span style={{ fontSize: 11, color: 'var(--outline)', background: 'var(--border)', padding: '3px 8px', borderRadius: 4 }}>{cat}</span>
                           </td>
                           <td style={{ padding: '10px 14px', textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: 700, color: 'var(--on-surface)' }}>
                             {r.completed.toLocaleString()}

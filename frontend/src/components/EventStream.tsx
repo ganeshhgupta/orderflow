@@ -6,7 +6,7 @@ interface Order {
   id: string;
   item: string;
   status: string;
-  progress: number;
+  price: number;
   worker_id?: string;
   retries?: number;
   created_at?: string;
@@ -19,22 +19,6 @@ interface Metrics {
   error_rate?: number;
 }
 
-function workerName(id: string) {
-  const n = id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-  const names = ['Axon', 'Flux', 'Nova', 'Zeta', 'Apex', 'Core', 'Edge', 'Node'];
-  return `WK-${names[n % names.length]}-${String((n % 99) + 1).padStart(2, '0')}`;
-}
-
-function itemPrice(id: string) {
-  const n = id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-  return (((n % 8900) + 100) / 100).toFixed(2);
-}
-
-function stockInfo(progress: number): { pct: number; color: string; label: string } {
-  if (progress < 20) return { pct: progress, color: 'var(--error)', label: 'Critical' };
-  if (progress < 55) return { pct: progress, color: 'var(--tertiary)', label: 'Warning' };
-  return { pct: progress, color: 'var(--secondary)', label: 'Optimal' };
-}
 
 function StatusPill({ status }: { status: string }) {
   const map: Record<string, { bg: string; color: string; border: string; label: string }> = {
@@ -73,7 +57,7 @@ const T = {
   error:     'var(--error)',
 };
 
-const COL = '28px 1fr 120px 160px 80px 110px 80px';
+const COL = '28px 1fr 90px 110px 80px';
 
 function TableRow({ order, checked, onCheck }: {
   order: Order;
@@ -81,9 +65,6 @@ function TableRow({ order, checked, onCheck }: {
   onCheck: (id: string) => void;
 }) {
   const [hovered, setHovered] = useState(false);
-  const stock = stockInfo(order.progress ?? 50);
-  const price = itemPrice(order.id);
-  const worker = workerName(order.worker_id ?? order.id);
 
   return (
     <div
@@ -118,21 +99,8 @@ function TableRow({ order, checked, onCheck }: {
         </span>
       </div>
 
-      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: T.outline, paddingRight: 16 }}>
-        {worker}
-      </div>
-
-      <div style={{ paddingRight: 16 }}>
-        <div style={{ width: 120, height: 6, borderRadius: 3, background: 'var(--border-hi)', overflow: 'hidden' }}>
-          <div style={{ width: `${stock.pct}%`, height: '100%', background: stock.color, borderRadius: 3, transition: 'width 0.4s ease' }} />
-        </div>
-        <p style={{ fontSize: 10, marginTop: 3, color: stock.color, fontFamily: 'JetBrains Mono, monospace' }}>
-          {stock.pct} / 100 units
-        </p>
-      </div>
-
       <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: T.onSurface, paddingRight: 16 }}>
-        ${price}
+        ${order.price?.toFixed(2) ?? '—'}
       </div>
 
       <div style={{ paddingRight: 16 }}>
@@ -140,7 +108,7 @@ function TableRow({ order, checked, onCheck }: {
       </div>
 
       <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end' }}>
-        {['visibility', 'edit'].map(icon => (
+        {['visibility'].map(icon => (
           <button key={icon}
             style={{
               background: 'none', border: 'none', cursor: 'pointer',
@@ -201,12 +169,8 @@ export default function EventStream() {
 
   const processing = metrics?.total_processing ?? 0;
   const workers = metrics?.worker_count ?? 0;
-  const throughputPct = metrics?.throughput_per_sec
-    ? Math.min(100, (metrics.throughput_per_sec / 10) * 100)
-    : 98.2;
-
-  const criticalCount = orders.filter(o => (o.progress ?? 50) < 20).length;
-  const completedCount = orders.filter(o => o.status === 'completed').length;
+  const failedCount = orders.filter(o => o.status === 'failed' || o.status === 'FAILED').length;
+  const completedCount = orders.filter(o => o.status === 'completed' || o.status === 'COMPLETED').length;
   const workerLoad = workers > 0 ? Math.round((processing / workers) * 100) : 0;
 
   return (
@@ -233,7 +197,7 @@ export default function EventStream() {
               System Pulse
             </div>
             <div style={{ fontSize: 12, color: T.outline, fontFamily: 'Inter, sans-serif', marginTop: 2 }}>
-              {throughputPct.toFixed(1)}% Throughput Â· {workers} Nodes
+              {processing} Processing · {workers} Workers
             </div>
           </div>
           <div style={{ position: 'absolute', top: 10, right: 12 }}>
@@ -249,10 +213,10 @@ export default function EventStream() {
 
         <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, padding: '12px 20px', textAlign: 'right' }}>
           <div style={{ fontSize: 10, fontWeight: 600, color: T.outline, letterSpacing: '0.06em', textTransform: 'uppercase', fontFamily: 'Inter, sans-serif', marginBottom: 6 }}>
-            Critical Low Stock
+            Failed Orders
           </div>
           <div style={{ fontSize: 28, fontWeight: 700, color: T.error, fontFamily: 'Inter, sans-serif', lineHeight: 1 }}>
-            {criticalCount}<span style={{ fontSize: 13, color: T.outline, fontWeight: 400, marginLeft: 4 }}>SKUs</span>
+            {failedCount}<span style={{ fontSize: 13, color: T.outline, fontWeight: 400, marginLeft: 4 }}>Orders</span>
           </div>
         </div>
 
@@ -328,7 +292,7 @@ export default function EventStream() {
               style={{ accentColor: T.primary, width: 14, height: 14, cursor: 'pointer' }}
             />
           </div>
-          {['Order / Item', 'Worker', 'Stock Level', 'Price', 'Status', 'Actions'].map((h, i) => (
+          {['Order / Item', 'Price', 'Status', 'Actions'].map((h, i) => (
             <div key={h} style={{
               fontSize: 10, fontWeight: 700, color: T.outline,
               letterSpacing: '0.07em', textTransform: 'uppercase',

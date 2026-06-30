@@ -32,8 +32,6 @@ const PRIORITY_LABELS: Record<Priority, string> = {
   standard:  'FAILED',
 };
 
-const WORKER_NAMES = ['E. Martinez', 'S. Johansson', 'L. Zhang', 'K. Patel', 'A. Okonkwo'];
-const WORKER_STATUS = ['Queue Processing', 'DLQ Review', 'Break', 'Queue Processing', 'DLQ Review'];
 
 export default function DLQPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -418,40 +416,18 @@ export default function DLQPage() {
       {/* RIGHT PANEL */}
       <div style={{ width: 256, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 12, overflowY: 'auto' }}>
 
-        <div style={{ background: 'var(--surf1)', border: '1px solid var(--border)', borderRadius: 6, padding: '16px' }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--outline)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 14 }}>
-            Active Operators
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {WORKER_NAMES.map((name, i) => {
-              const isActive = i !== 2;
-              return (
-                <div key={name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', opacity: isActive ? 1 : 0.45 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{ width: 7, height: 7, borderRadius: '50%', flexShrink: 0, background: isActive ? 'var(--secondary)' : '#464554' }} />
-                    <span style={{ fontSize: 12, color: 'var(--on-variant)' }}>{name}</span>
-                  </div>
-                  <span style={{ fontSize: 11, color: isActive ? 'var(--primary)' : '#464554', fontFamily: "'JetBrains Mono', monospace" }}>
-                    {WORKER_STATUS[i]}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
         <div style={{
-          background: 'var(--surf3)', border: '1px solid rgba(78,222,163,0.2)', borderRadius: 6,
+          background: 'var(--surf1)', border: '1px solid var(--border)', borderRadius: 6,
           padding: '20px', position: 'relative', overflow: 'hidden',
         }}>
-          <span className="material-symbols-outlined" style={{ position: 'absolute', right: -10, bottom: -10, fontSize: 90, color: 'rgba(78,222,163,0.05)' }}>hub</span>
-          <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--secondary)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
-            System Health
+          <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--outline)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>
+            DLQ Status
           </div>
-          <div style={{ fontSize: 36, fontWeight: 700, color: 'var(--secondary)', lineHeight: 1, marginBottom: 6 }}>99.9%</div>
-          <div style={{ fontSize: 11, color: 'var(--outline)', marginBottom: 4 }}>Cloud Sync Latency: 42ms</div>
-          <div style={{ fontSize: 11, color: 'var(--outline)' }}>
-            DLQ Depth: <span style={{ color: orders.length > 0 ? 'var(--error)' : 'var(--secondary)', fontFamily: "'JetBrains Mono', monospace" }}>{orders.length}</span>
+          <div style={{ fontSize: 36, fontWeight: 700, color: orders.length > 0 ? 'var(--error)' : 'var(--secondary)', lineHeight: 1, fontFamily: "'JetBrains Mono', monospace", marginBottom: 6 }}>
+            {orders.length}
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--outline)' }}>
+            {orders.length === 0 ? 'No failed orders' : `failed order${orders.length !== 1 ? 's' : ''} in queue`}
           </div>
         </div>
 

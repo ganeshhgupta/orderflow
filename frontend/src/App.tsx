@@ -136,16 +136,10 @@ function CartDrawer({
 function WorkerHealthPanel({ metrics }: { metrics: Metrics | null }) {
   const count = metrics?.worker_count ?? 0;
   const processing = metrics?.total_processing ?? 0;
-  const timeoutIdx = count > 0 ? (count * 7 + 3) % count : -1;
   const tiles = Array.from({ length: Math.min(count, 18) }, (_, i) => {
-    const status = i === timeoutIdx ? 'TIMEOUT'
-      : i < processing ? 'BUSY'
-      : 'IDLE';
-    const statusColor = status === 'BUSY' ? 'var(--tertiary)' : status === 'TIMEOUT' ? 'var(--error)' : 'var(--secondary)';
-    const lastMs = status === 'BUSY' ? `${i * 7 + 5}ms ago`
-      : status === 'TIMEOUT' ? '12s ago'
-      : `${i * 41 + 100}ms ago`;
-    return { id: `WK-${String(i + 1).padStart(2, '0')}`, status, statusColor, lastMs };
+    const status = i < processing ? 'BUSY' : 'IDLE';
+    const statusColor = status === 'BUSY' ? 'var(--tertiary)' : 'var(--secondary)';
+    return { id: `WK-${String(i + 1).padStart(2, '0')}`, status, statusColor };
   });
   return (
     <div style={{ background: 'var(--surf1)', border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
@@ -173,12 +167,11 @@ function WorkerHealthPanel({ metrics }: { metrics: Metrics | null }) {
           {tiles.map(w => (
             <div key={w.id} style={{
               background: 'var(--surf2)',
-              border: w.status === 'TIMEOUT' ? '1px solid rgba(255,180,171,0.3)' : '1px solid var(--border)',
-              borderLeft: w.status === 'TIMEOUT' ? '2px solid #ffb4ab' : undefined,
+              border: '1px solid var(--border)',
               borderRadius: 4, padding: '8px',
               transition: 'background 0.15s',
             }}
-              onMouseEnter={e => { if (w.status !== 'TIMEOUT') (e.currentTarget as HTMLDivElement).style.background = '#273549'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = '#273549'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'var(--surf2)'; }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
@@ -186,12 +179,11 @@ function WorkerHealthPanel({ metrics }: { metrics: Metrics | null }) {
                 <div style={{
                   width: 8, height: 8, borderRadius: '50%',
                   background: w.statusColor,
-                  animation: w.status !== 'TIMEOUT' ? 'livePulse 2s ease-in-out infinite' : 'none',
+                  animation: 'livePulse 2s ease-in-out infinite',
                 }} />
               </div>
               <div style={{ fontSize: 10, textTransform: 'uppercase', color: 'var(--outline)', marginBottom: 4, fontWeight: 700 }}>Status</div>
-              <div style={{ fontSize: 12, fontFamily: "'JetBrains Mono', monospace", color: w.statusColor, marginBottom: 8 }}>{w.status}</div>
-              <div style={{ fontSize: 10, color: '#464554' }}>Last: {w.lastMs}</div>
+              <div style={{ fontSize: 12, fontFamily: "'JetBrains Mono', monospace", color: w.statusColor }}>{w.status}</div>
             </div>
           ))}
         </div>
