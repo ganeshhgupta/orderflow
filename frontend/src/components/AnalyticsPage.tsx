@@ -74,6 +74,22 @@ export default function AnalyticsPage() {
     const t0 = Date.now();
     const ticker = setInterval(() => setElapsed(Math.floor((Date.now() - t0) / 1000)), 500);
     try {
+      // Place real orders so the Live Pipeline animates during the run
+      const burst = [
+        { item: 'Laptop',              quantity: 1, price: 1299 },
+        { item: 'Mechanical Keyboard', quantity: 2, price: 149  },
+        { item: '4K Monitor',          quantity: 1, price: 449  },
+        { item: 'Headphones',          quantity: 1, price: 249  },
+        { item: 'GPU',                 quantity: 1, price: 799  },
+      ];
+      await Promise.all(burst.map(o =>
+        fetch(`${API_BASE}/orders`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(o),
+        }).catch(() => null)
+      ));
+
       const r    = await fetch(`${API_BASE}/analytics/run`, { method: 'POST' });
       const text = await r.text();
       clearInterval(ticker);
@@ -93,32 +109,24 @@ export default function AnalyticsPage() {
   const totalCompleted = items.reduce((s, r) => s + r.completed, 0);
   const totalFailed    = items.reduce((s, r) => s + r.failed,    0);
   const totalOrders    = items.reduce((s, r) => s + r.total,     0);
-  const successRate    = totalOrders > 0 ? Math.round((totalCompleted / totalOrders) * 100) : 97;
-  const throughputStr  = totalOrders > 1000 ? `${(totalOrders / 1000).toFixed(1)}K` : totalOrders > 0 ? String(totalOrders) : '8.42K';
+  const successRate    = totalOrders > 0 ? Math.round((totalCompleted / totalOrders) * 100) : 0;
+  const throughputStr  = totalOrders > 1000 ? `${(totalOrders / 1000).toFixed(1)}K` : totalOrders > 0 ? String(totalOrders) : '—';
   const maxCompleted   = Math.max(...items.map(r => r.completed), 1);
 
-  // Ring SVG: r=56, Câ‰ˆ351.8
+  // Ring SVG: r=56, C≈351.8
   const ringR = 56;
   const ringC = 2 * Math.PI * ringR;
   const ringOffset = ringC * (1 - successRate / 100);
 
   // Bar chart items: top 5 by completed
-  const barItems = items.length > 0
-    ? [...items].sort((a, b) => b.completed - a.completed).slice(0, 5)
-    : [
-        { item: 'Electronics',    completed: 140 },
-        { item: 'Furniture',      completed: 80  },
-        { item: 'Apparel',        completed: 120 },
-        { item: 'Consumer Goods', completed: 160 },
-        { item: 'Raw Materials',  completed: 60  },
-      ];
+  const barItems = [...items].sort((a, b) => b.completed - a.completed).slice(0, 5);
   const maxBar = Math.max(...barItems.map(b => b.completed), 1);
 
-  // Donut segments: r=70, Câ‰ˆ439.82
+  // Donut segments: r=70, C≈439.82
   const donutR = 70;
   const donutC = 2 * Math.PI * donutR;
-  const cpct   = totalOrders > 0 ? totalCompleted / totalOrders : 0.76;
-  const fpct   = totalOrders > 0 ? totalFailed    / totalOrders : 0.12;
+  const cpct   = totalOrders > 0 ? totalCompleted / totalOrders : 0;
+  const fpct   = totalOrders > 0 ? totalFailed    / totalOrders : 0;
   const rpct   = Math.max(1 - cpct - fpct, 0);
 
   const retriedOrders = data?.retry_dist?.filter(r => r.retry_count > 0).reduce((s, r) => s + r.count, 0) ?? 0;
